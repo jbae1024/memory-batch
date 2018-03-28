@@ -23,7 +23,7 @@ public class InMemoryStudentWriter implements ItemWriter<StudentDTO> {
         LOGGER.info("저장할 학생 아이템 {}개", items.size());
 
         for( StudentDTO item : items ){
-            LOGGER.info("학생들은 : {}", item);
+            LOGGER.info("DB 저장 go go : {}", item);
         }
 
     }
