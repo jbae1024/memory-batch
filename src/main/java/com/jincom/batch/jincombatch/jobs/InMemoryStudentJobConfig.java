@@ -40,7 +40,7 @@ public class InMemoryStudentJobConfig {
                              ItemWriter<StudentDTO> inMemoryStudentWriter,
                              StepBuilderFactory stepBuilderFactory) {
         return stepBuilderFactory.get("inMemoryStudentStep")
-                .<StudentDTO, StudentDTO>chunk(1)
+                .<StudentDTO, StudentDTO>chunk(100)
                 .reader(inMemoryStudentReader)
                 .processor(inMemoryStudentProcessor)
                 .writer(inMemoryStudentWriter)
