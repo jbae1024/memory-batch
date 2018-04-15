@@ -4,6 +4,7 @@ import com.jincom.batch.jincombatch.dto.LayoutSpecVO;
 import com.jincom.batch.jincombatch.dto.MessageDTO;
 import com.jincom.batch.jincombatch.dto.MessageFooterVO;
 import com.jincom.batch.jincombatch.dto.MessageHeaderVO;
+import com.jincom.batch.jincombatch.utils.LayoutUtil;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -15,6 +16,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -62,23 +64,7 @@ public class MessageTasklet implements Tasklet {
             if(tempFile.isFile()
                     && "message.txt".equals(tempFile.getName())){
 
-                //HEADER
-                FileReader headerReader = new FileReader(tempFile);
-                BufferedReader headerBufferedReader = new BufferedReader(headerReader);
                 String lineStr;
-
-                MessageHeaderVO messageHeaderVO = null;
-                MessageFooterVO messageFooterVO = null;
-
-                while ((lineStr=headerBufferedReader.readLine())!= null){
-                    if(lineStr.substring(0,1).equals("S")){
-                        messageHeaderVO = new MessageHeaderVO(lineStr);
-                    }
-                    if(lineStr.substring(0,1).equals("E")){
-                        messageFooterVO = new MessageFooterVO(lineStr);
-                    }
-                }
-
 
                 //BODY
                 FileReader bodyReader = new FileReader(tempFile);
@@ -87,19 +73,9 @@ public class MessageTasklet implements Tasklet {
                 while ((lineStr=bodyBufferedReader.readLine())!= null){
 
                     if(lineStr.substring(0,1).equals("D")){
-
-                        System.out.println(messageHeaderVO);
-
-//                        MessageDTO messageDTO = new MessageDTO(lineStr, messageHeaderVO);
-
-                        MessageDTO messageDTO = new MessageDTO(lineStr, messageHeaderVO, messageFooterVO);
-
+                        MessageDTO messageDTO = new MessageDTO(lineStr, messageHeader(tempFile),
+                                new LayoutUtil(tempFile).getMessageFooterVO());
                         messageDTOs.add(messageDTO);
-
-                        MessageDTO case2messageDTO = new MessageDTO();
-                        case2messageDTO.setMessageHeaderVO(messageHeaderVO);
-                        case2messageDTO.setMsgOneLine(lineStr);
-
                     }
 //                    System.out.println(messageDTO.getDivide());
 //                    MessageDTO messageDTO = new MessageDTO(lineStr);
@@ -111,9 +87,43 @@ public class MessageTasklet implements Tasklet {
                 }
             }
         }
-        System.out.println(messageDTOs);
+
+//        System.out.println(messageDTOs);
         return RepeatStatus.FINISHED;
 
     }
+
+    private MessageHeaderVO messageHeader ( File tempFile )
+            throws IOException {
+
+        FileReader reader = new FileReader(tempFile);
+        BufferedReader bufferedReader = new BufferedReader(reader);
+
+        MessageHeaderVO messageHeaderVO = null;
+        String lineStr;
+        while ((lineStr=bufferedReader.readLine())!= null){
+            if(lineStr.substring(0,1).equals("S")){
+                messageHeaderVO = new MessageHeaderVO(lineStr);
+            }
+        }
+        return messageHeaderVO;
+    }
+
+    private MessageFooterVO messageFooter ( File tempFile )
+            throws IOException {
+
+        FileReader reader = new FileReader(tempFile);
+        BufferedReader bufferedReader = new BufferedReader(reader);
+
+        MessageFooterVO messageFooterVO = null;
+        String lineStr;
+        while ((lineStr=bufferedReader.readLine())!= null){
+            if(lineStr.substring(0,1).equals("E")){
+                messageFooterVO = new MessageFooterVO(lineStr);
+            }
+        }
+        return messageFooterVO;
+    }
+
 
 }
