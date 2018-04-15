@@ -1,8 +1,13 @@
 package com.jincom.batch.jincombatch.dto;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
+
 public class MessageDTO {
+
+    //BODY
     private String divide;
     private String bankBranchNo;
     private String custNo;
@@ -10,6 +15,97 @@ public class MessageDTO {
     private String transferAmount;
     private String sendCondition;
     private String msgOneLine;
+
+    //HEADER
+    private MessageHeaderVO messageHeaderVO;
+
+    //FOOTER
+    private MessageFooterVO messageFooterVO;
+
+    private LayoutSpecVO layoutSpecVO;
+
+    private ArrayList<LayoutSpecVO> layoutSpecVOs;
+
+    public MessageDTO() {
+
+    }
+
+    public MessageDTO(String msgOneLine) {
+        this.msgOneLine = msgOneLine;
+        this.divide = this.msgOneLine.substring(0, 5);
+        this.bankBranchNo = this.msgOneLine.substring(6, 7);
+    }
+
+    public MessageDTO( String msgOneLine, MessageHeaderVO messageHeaderVO ) {
+
+        this.msgOneLine = msgOneLine;
+        this.messageHeaderVO = messageHeaderVO;
+
+        System.out.println(messageHeaderVO.getBaseDate()+"|"+msgOneLine);
+
+    }
+
+    public MessageDTO(String msgOneLine, MessageHeaderVO messageHeaderVO, MessageFooterVO messageFooterVO) {
+        this.msgOneLine = msgOneLine;
+        this.messageHeaderVO = messageHeaderVO;
+        this.messageFooterVO = messageFooterVO;
+
+        System.out.println(messageHeaderVO.getBaseDate()+"|"+msgOneLine+"|"+messageFooterVO.getStatus());
+
+    }
+
+    public MessageDTO(LayoutSpecVO layoutSpecVO) {
+        this.layoutSpecVO = layoutSpecVO;
+    }
+
+    public MessageDTO(ArrayList<LayoutSpecVO> layoutSpecVOs) {
+
+        this.layoutSpecVOs = layoutSpecVOs;
+
+        for(LayoutSpecVO layoutSpecVO : layoutSpecVOs ){
+            if(layoutSpecVO.getFileName().equals("message.txt")){
+                if(layoutSpecVO.getColName().equals("divide")){
+                    this.divide = this.msgOneLine.substring(0, 5);
+                }
+                if(layoutSpecVO.getColName().equals("bankBranchNo")){
+                    this.bankBranchNo = this.msgOneLine.substring(5, 6);
+                }
+            }
+        }
+
+    }
+
+    public MessageFooterVO getMessageFooterVO() {
+        return messageFooterVO;
+    }
+
+    public void setMessageFooterVO(MessageFooterVO messageFooterVO) {
+        this.messageFooterVO = messageFooterVO;
+    }
+
+    public MessageHeaderVO getMessageHeaderVO() {
+        return messageHeaderVO;
+    }
+
+    public void setMessageHeaderVO(MessageHeaderVO messageHeaderVO) {
+        this.messageHeaderVO = messageHeaderVO;
+    }
+
+    public LayoutSpecVO getLayoutSpecVO() {
+        return layoutSpecVO;
+    }
+
+    public void setLayoutSpecVO(LayoutSpecVO layoutSpecVO) {
+        this.layoutSpecVO = layoutSpecVO;
+    }
+
+    public ArrayList<LayoutSpecVO> getLayoutSpecVOs() {
+        return layoutSpecVOs;
+    }
+
+    public void setLayoutSpecVOs(ArrayList<LayoutSpecVO> layoutSpecVOs) {
+        this.layoutSpecVOs = layoutSpecVOs;
+    }
 
     public String getDivide() {
         return divide;
@@ -64,6 +160,11 @@ public class MessageDTO {
     }
 
     public void setMsgOneLine(String msgOneLine) {
+
+
+        System.out.println("case2 | "+messageHeaderVO.getBaseDate()+"|"+msgOneLine);
+
+
         this.msgOneLine = msgOneLine;
     }
 

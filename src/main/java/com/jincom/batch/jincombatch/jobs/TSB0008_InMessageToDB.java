@@ -1,7 +1,10 @@
 package com.jincom.batch.jincombatch.jobs;
 
 import com.jincom.batch.jincombatch.dto.MessageDTO;
+import com.jincom.batch.jincombatch.tasklet.AaaTasklet;
+import com.jincom.batch.jincombatch.tasklet.BbbTasklet;
 import com.jincom.batch.jincombatch.tasklet.FindFileTasklet;
+import com.jincom.batch.jincombatch.tasklet.MessageTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -57,17 +60,87 @@ public class TSB0008_InMessageToDB {
     }
 
 
-    @Bean
-    Job inMessageToDJob(JobBuilderFactory jobBuilderFactory,
-                        @Qualifier("findFileStep") Step findFileStep,
-                        @Qualifier("inMessageToDStep") Step inMessageToDStep) {
+//    @Bean
+//    Job inMessageToDJob(JobBuilderFactory jobBuilderFactory,
+//                        @Qualifier("findFileStep") Step findFileStep,
+//                        @Qualifier("inMessageToDStep") Step inMessageToDStep) {
+//
+//        return jobBuilderFactory.get("inMessageToDJob")
+//                .incrementer(new RunIdIncrementer())
+//                .flow(findFileStep)
+//                .next(inMessageToDStep)
+//                .end()
+//                .build();
+//
+//    }
 
-        return jobBuilderFactory.get("inMessageToDJob")
+    ////
+    @Bean
+    MessageTasklet messageTasklet(){
+        return new MessageTasklet();
+    }
+
+    @Bean
+    AaaTasklet aaaTasklet(){
+        return new AaaTasklet();
+    }
+
+    @Bean
+    BbbTasklet bbbTasklet(){
+        return new BbbTasklet();
+    }
+
+
+    @Bean
+    Step messageStep(StepBuilderFactory stepBuilderFactory,
+                     @Qualifier("inMessageToDStep") Step inMessageToDStep,
+                     MessageTasklet messageTasklet){
+
+        return stepBuilderFactory.get("messageStep")
+                .tasklet(messageTasklet)
+                .build();
+
+    }
+
+
+    @Bean
+    Step aaaStep(StepBuilderFactory stepBuilderFactory,
+                 AaaTasklet aaaTasklet){
+        return stepBuilderFactory.get("aaaStep")
+                .tasklet(aaaTasklet)
+                .build();
+    }
+
+    @Bean
+    Step bbbStep(StepBuilderFactory stepBuilderFactory,
+                 BbbTasklet bbbTasklet){
+        return stepBuilderFactory.get("bbbStep")
+                .tasklet(bbbTasklet)
+                .build();
+    }
+
+
+    @Bean
+    Job hanaJob(JobBuilderFactory jobBuilderFactory,
+                Step messageStep,
+                Step aaaStep,
+                Step bbbStep) {
+
+        return jobBuilderFactory.get("hanaJob")
                 .incrementer(new RunIdIncrementer())
-                .flow(findFileStep)
-                .next(inMessageToDStep)
+                .flow(messageStep)
+                .next(aaaStep)
+                .next(bbbStep)
                 .end()
                 .build();
 
     }
+
+
+
+
+
+
+
+
 }

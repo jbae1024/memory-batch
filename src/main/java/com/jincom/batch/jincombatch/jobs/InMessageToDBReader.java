@@ -20,7 +20,7 @@ public class InMessageToDBReader implements ItemReader<MessageDTO> {
     public MessageDTO read() throws Exception{
 
         LOGGER.info("<Message File> Read Strat");
-        String path="/Users/youngsikoh/memory-batch/src/main/resources/data/";
+        String path="/Users/jinhwancom/Projects/memory-batch/src/main/resources/data/";
         File dirFile = new File(path);
         File[] fileList = dirFile.listFiles();
         System.out.println("1");
@@ -35,7 +35,7 @@ public class InMessageToDBReader implements ItemReader<MessageDTO> {
         System.out.println("2");
 
 
-        File filePath = new File("/Users/youngsikoh/memory-batch/src/main/resources/data/message.txt");
+        File filePath = new File("/Users/jinhwancom/Projects/memory-batch/src/main/resources/data/message.txt");
         FileReader fReader = new FileReader(filePath);
         BufferedReader bufferedReader = new BufferedReader(fReader);
 
@@ -62,7 +62,6 @@ public class InMessageToDBReader implements ItemReader<MessageDTO> {
             products.add(newLineAddOne);
             System.out.println("products"+products.get(i).getMsgOneLine());
         }
-
 
 //        LOGGER.info("<Message File> 라인별 컬럼 생성 완료 ");
         LOGGER.info("<Message File> 라인별 컬럼 생성 전체 : {}",products);
