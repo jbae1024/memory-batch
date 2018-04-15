@@ -1,6 +1,7 @@
 package com.jincom.batch.jincombatch.jobs;
 
 import com.jincom.batch.jincombatch.dto.MessageDTO;
+import com.jincom.batch.jincombatch.tasklet.FindFileTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TSB0008_InMessageToDB {
+
     @Bean
     ItemReader<MessageDTO> inMessageToDBReader() {
         return new InMessageToDBReader();
@@ -39,13 +41,33 @@ public class TSB0008_InMessageToDB {
                 .build();
     }
 
+
+    @Bean
+    FindFileTasklet findFileTasklet(){
+        return new FindFileTasklet();
+    }
+
+    @Bean
+    Step findFileStep(StepBuilderFactory stepBuilderFactory,
+                      FindFileTasklet findFileTasklet){
+
+        return stepBuilderFactory.get("findFileStep")
+                .tasklet(findFileTasklet)
+                .build();
+    }
+
+
     @Bean
     Job inMessageToDJob(JobBuilderFactory jobBuilderFactory,
+                        @Qualifier("findFileStep") Step findFileStep,
                         @Qualifier("inMessageToDStep") Step inMessageToDStep) {
+
         return jobBuilderFactory.get("inMessageToDJob")
                 .incrementer(new RunIdIncrementer())
-                .flow(inMessageToDStep)
+                .flow(findFileStep)
+                .next(inMessageToDStep)
                 .end()
                 .build();
+
     }
 }
